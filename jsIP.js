@@ -76,6 +76,18 @@ var parseIPv6 = function (addr_str) {
 	return items;
 }
 
+var getHex = function (num) {
+	return num.toString(16);
+}
+
+var getFullHex = function (num) {
+	val = getHex(num);
+	while (val.length < 4) {
+		val = '0' + val;
+	}
+	return val;
+}
+
 var printIPv4_helper = function (ip) {
 	bytes = []
 	bytes.push(ip[6]>>8);
@@ -105,11 +117,7 @@ var printFullIPv4 = function (ip) {
 var printFullIPv6 = function (ip) {
 	out = []
 	for (i in ip) {
-		val = ip[i].toString(16);
-		while (val.length < 4) {
-			val = '0' + val;
-		}
-		out.push(val);
+		out.push(getFullHex(ip[i]));
 	}
 	return out.join(':');
 }
@@ -117,17 +125,38 @@ var printFullIPv6 = function (ip) {
 var printNormalIPv6 = function (ip) {
 	out = []
 	for (i in ip) {
-		out.push(ip[i].toString(16));
+		out.push(getHex(ip[i]));
 	}
 	return out.join(':');
 }
 
 var printCompressedIPv6 = function (ip, start, skip) {
-	out = []
-	end = start + skip;
+	long_run       = 0;
+	long_run_start = -1;
+	run            = 0;
+	run_start      = -1;
+	for (i=0; i<9; i++) {
+		if (i<8 && self.ip[i] == 0) {
+			run++;
+			if (run_start == -1) {
+				run_start = i;
+			}
+		} else {
+			if (run > long_run) {
+				long_run       = run;
+				long_run_start = run_start;
+			}
+			run       = 0;
+			run_start = -1;
+		}
+	}
+
+	out   = []
+	start = long_run_start
+	end   = start + long_run;
 	for (i in ip) {
 		if (i < start || i >= end) {
-			out.push(ip[i].toString(16));
+			out.push(getHex(ip[i]));
 		} else if (i == start) {
 			out.push(':');
 		}
@@ -166,11 +195,18 @@ IP = function (addr, version) {
 		} else if (addr.indexOf(':') > -1) {
 			self.ip = parseIPv6(addr);
 			self.version = 6;
+
 		} else if (addr.indexOf('.') > -1) {
 			v4 = compactIPv4(parseIPv4(addr));
 			self.ip[6] = v4[0];
 			self.ip[7] = v4[1];
-			self.version = 4;
+			if (self.version == 6) {
+				// user wants this to be a IPv6 address, but we
+				//  need to convert an ipv4 address
+				self.ip[5] = 0xffff;
+			} else {
+				self.version = 4;
+			}
 		}
 
 	}
@@ -191,30 +227,9 @@ IP = function (addr, version) {
 				return "::ffff:" + printIPv4(self.ip);
 
 			} else {
-				long_run       = 0;
-				long_run_start = -1;
-				run            = 0;
-				run_start      = -1;
-				for (i=0; i<9; i++) {
-					if (i<8 && self.ip[i] == 0) {
-						run++;
-						if (run_start == -1) {
-							run_start = i;
-						}
-					} else {
-						if (run > long_run) {
-							long_run       = run;
-							long_run_start = run_start;
-						}
-						run       = 0;
-						run_start = -1;
-					}
-				}
-				return printCompressedIPv6(self.ip, long_run_start, long_run);
+				return printCompressedIPv6(self.ip);
 
 			}
-
-
 		}
 	}
 
@@ -236,6 +251,56 @@ IP = function (addr, version) {
 				return printFullIPv6(self.ip);
 
 			}
+		}
+	}
+
+	// If ipv4, print ipv4
+	// If ipv6 and looks like ipv4, print ipv4
+	// Else, print ipv6
+	self.pureStr = function () {
+		if (self.version == 4) {
+			return printIPv4(self.ip);
+
+		} else if (self.version == 6) {
+
+			if (self.ip[0] == 0 &&
+			    self.ip[1] == 0 &&
+			    self.ip[2] == 0 &&
+			    self.ip[3] == 0 &&
+			    self.ip[4] == 0 &&
+			    self.ip[5] == 0xffff) {
+				// ipv4 address as ipv6 address
+				return printIPv4(self.ip);
+
+			} else {
+				return printCompressedIPv6(self.ip);
+
+			}
+		}
+	}
+
+	self.hex = function () {
+		if (self.vesrsion == 4) {
+			out = "0x";
+			out += getHex(self.ip[6]);
+			out += getFullHex(self.ip[7]);
+			return out;
+
+		} else if (self.version == 6) {
+			out = "0x";
+			have_content = false;
+			for (i=0; i<8; i++) {
+				if (!have_content) {
+					val = getHex(self.ip[i]);
+					if (val != "0") {
+						out += val;
+						have_content = true;
+					}
+				} else {
+					out += getFullHex(self.ip[i]);
+				}
+			}
+			return out;
 		}
 	}
 
