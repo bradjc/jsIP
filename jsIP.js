@@ -136,13 +136,8 @@ var printCompressedIPv6 = function (ip, start, skip) {
 }
 
 
-
-
-
 IP = function (addr, version) {
-//exports.IP = function (addr, version) {
 	if (!(this instanceof IP)) return new IP(addr, version);
-
 
 	var self = this;
 
@@ -246,6 +241,9 @@ IP = function (addr, version) {
 
 }
 
+module.exports = IP;
+
+/*
 console.log(IP('67::ffff:8a:9c').str());
 console.log(IP('67:ffff:8a:9c::5').str());
 console.log(IP('0xffff8dd46ef5').str());
@@ -258,4 +256,4 @@ console.log(IP('0xffff8dd46ef5').fullStr());
 console.log(IP('::ffff:192.168.1.1').fullStr());
 console.log(IP('192.255.9.10').fullStr());
 
-
+*/
