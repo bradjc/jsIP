@@ -76,13 +76,30 @@ var parseIPv6 = function (addr_str) {
 	return items;
 }
 
-var printIPv4 = function (ip) {
+var printIPv4_helper = function (ip) {
 	bytes = []
 	bytes.push(ip[6]>>8);
 	bytes.push(ip[6]&0xff);
 	bytes.push(ip[7]>>8);
 	bytes.push(ip[7]&0xff);
-	return bytes.join('.');
+	return bytes;
+}
+
+var printIPv4 = function (ip) {
+	return printIPv4_helper(ip).join('.');
+}
+
+var printFullIPv4 = function (ip) {
+	bytes = printIPv4_helper(ip);
+	out   = [];
+	for (b in bytes) {
+		val = bytes[b].toString();
+		while (val.length < 3) {
+			val = '0' + val;
+		}
+		out.push(val);
+	}
+	return out.join('.');
 }
 
 var printFullIPv6 = function (ip) {
@@ -162,7 +179,6 @@ IP = function (addr, version) {
 		}
 
 	}
-//	console.log('ip: ' + ip);
 
 	self.str = function () {
 		if (self.version == 4) {
@@ -207,16 +223,39 @@ IP = function (addr, version) {
 		}
 	}
 
+	self.fullStr = function () {
+		if (self.version == 4) {
+			return printFullIPv4(self.ip);
+
+		} else if (self.version == 6) {
+			if (self.ip[0] == 0 &&
+			    self.ip[1] == 0 &&
+			    self.ip[2] == 0 &&
+			    self.ip[3] == 0 &&
+			    self.ip[4] == 0 &&
+			    self.ip[5] == 0xffff) {
+				// ipv4 address as ipv6 address
+				return "0000:0000:0000:0000:0000:ffff:" + printFullIPv4(self.ip);
+
+			} else {
+				return printFullIPv6(self.ip);
+
+			}
+		}
+	}
+
 }
-/*
-ip = IP('0xfffabcde');
-//console.log(ip);
-ip.str();
-IP('::ffff:8a:9c');*/
+
 console.log(IP('67::ffff:8a:9c').str());
 console.log(IP('67:ffff:8a:9c::5').str());
 console.log(IP('0xffff8dd46ef5').str());
 console.log(IP('::ffff:192.168.1.1').str());
 console.log(IP('192.255.9.10').str());
+
+console.log(IP('67::ffff:8a:9c').fullStr());
+console.log(IP('67:ffff:8a:9c::5').fullStr());
+console.log(IP('0xffff8dd46ef5').fullStr());
+console.log(IP('::ffff:192.168.1.1').fullStr());
+console.log(IP('192.255.9.10').fullStr());
 
 
