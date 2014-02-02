@@ -1,13 +1,24 @@
 {
-	"name"       : "jsIP",
-	"description": "IP parsing library for Javascript.",
-	"keywords"   : ["ip address", "ipv6", "ipv4"],
-	"author"     : "Brad Campbell",
-	"version"    : "0.1",
-	"main"       : "jsIP.js",
-	"homepage"   : "https://github.com/bradjc/jsIP",
-	"repository" : {
-		"type": "git",
-		"url" : "git://github.com/bradjc/jsIP.git"
-	}
+  "name": "js-ip",
+  "version": "0.1.2",
+  "description": "Javascript IP address parser and manipulator.",
+  "main": "jsIP.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/bradjc/jsIP"
+  },
+  "keywords": [
+    "ipv6",
+    "ipv4",
+    "address"
+  ],
+  "author": "Brad Campbell",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bradjc/jsIP/issues"
+  },
+  "homepage": "https://github.com/bradjc/jsIP"
 }
