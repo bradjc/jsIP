@@ -136,7 +136,7 @@ var printCompressedIPv6 = function (ip, start, skip) {
 	run            = 0;
 	run_start      = -1;
 	for (i=0; i<9; i++) {
-		if (i<8 && self.ip[i] == 0) {
+		if (i<8 && ip[i] == 0) {
 			run++;
 			if (run_start == -1) {
 				run_start = i;
