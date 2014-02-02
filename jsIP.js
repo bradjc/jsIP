@@ -306,7 +306,6 @@ IP = function (addr, version) {
 
 }
 
-module.exports = IP;
 
 /*
 console.log(IP('67::ffff:8a:9c').str());
