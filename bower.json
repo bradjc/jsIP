@@ -1,0 +1,15 @@
+{
+  "name": "jsIP",
+  "main": "jsIP.js",
+  "version": "0.1.0",
+  "homepage": "https://github.com/bradjc/jsIP",
+  "authors": [
+    "Brad Campbell <bradjc5@gmail.com>"
+  ],
+  "description": "IPv4 and IPv6 address parser and manipulator.",
+  "keywords": [
+    "ipv6",
+    "address"
+  ],
+  "license": "MIT"
+}
